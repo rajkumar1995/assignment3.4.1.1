@@ -1,0 +1,26 @@
+ Explain HDFS federation and High availability
+hadoop federation improves the architecture by seperating the name node and storage it will increase the storage level the main idea is it will increase the number of name node running on their own instance every name node is responsible for the data file blocks in its own namespace and each name space has its own block pool
+
+block pool: set of block that will be belonging to a specific name space and it is managed independently and name node failure will no way affect the data node serving the other name nodes
+
+name space volume:a block pool and  its name space together called as name space volume when a namenode is deleted the corresponding block pool will also be deleted 
+
+high availability
+*active name node
+*stand by name node
+
+These name nodes must use highly available share storage to share the edit log
+ standby name node:
+                     The Standby NameNode requires to be in a dedicated master node that is configured very similar to the master node used by the Active NameNode  and it stand by node will manage all the block address requests. The Standby NameNode is charged with the job of keeping the state of the block locations and block metadata in memory, managing the HDFS check-pointing duties.
+
+
+
+2. How HDFS handles failures while writing data
+     1. The pipeline is closed and any packets in the ack queue are added to the front of the data queue
+     2. The current block on the good DataNodes is given a new identity, which is communicated to the name node
+     3. The failed DataNode is removed from the pipeline, and a new pipeline is constructed from  the two good data nodes
+     4. The remainder of the block  data is written to the good DataNodes in the pipeline 
+     5. The NameNode notices that the block is under-replicated, and it arranges for a further replica to be created on another node
+     6. As long as dfs.namenode.replication.min replicas are written, the write will suceed
+     7. The block will be asynchronously replicated across the cluster until its target replication factor is reached. 
+       
